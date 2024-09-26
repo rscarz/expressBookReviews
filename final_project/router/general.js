@@ -35,22 +35,62 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/', function (req, res) {
+// public_users.get('/', function (req, res) {
+//     //Write your code here
+//     res.send(JSON.stringify({ books }, null, 4));
+// });
+public_users.get('/', async function (req, res) {
     //Write your code here
-    res.send(JSON.stringify({ books }, null, 4));
+    try {
+        const lAllBook = await new Promise((resolve, reject) => {
+            if (books) {
+                resolve(books);
+            } else {
+                reject("Books data is not available.");
+            }
+
+            res.send(JSON.stringify({ books }, null, 4));
+        })
+    } catch (error) {
+
+        res.status(500).send(error.message);
+    }
+
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn', function (req, res) {
+// public_users.get('/isbn/:isbn', function (req, res) {
+//     //Write your code here
+//     const { isbn } = req.params;
+//     const lBook = books[isbn];
+
+//     if (lBook) {
+//         return res.send(JSON.stringify({ lBook }, null, 4));
+//     } else {
+//         return res.status(404).json({ message: "Libro no encontrado" });
+//     }
+// });
+public_users.get('/isbn/:isbn', async function (req, res) {
     //Write your code here
     const { isbn } = req.params;
-    const lBook = books[isbn];
 
-    if (lBook) {
-        return res.send(JSON.stringify({ lBook }, null, 4));
-    } else {
-        return res.status(404).json({ message: "Libro no encontrado" });
-    }
+
+    let lISNB = new Promise((resolve, reject) => {
+        const lBook = books[isbn];
+
+        if (lBook) {
+            resolve(lBook);
+        } else {
+            reject("Libro no encontrado.");
+        }
+
+    })
+
+    lISNB.then((book) => {
+        res.send(book);
+    });
+    
+     
 
 });
 
