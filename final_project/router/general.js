@@ -52,10 +52,8 @@ public_users.get('/', async function (req, res) {
             res.send(JSON.stringify({ books }, null, 4));
         })
     } catch (error) {
-
         res.status(500).send(error.message);
     }
-
 });
 
 // Get book details based on ISBN
@@ -89,52 +87,92 @@ public_users.get('/isbn/:isbn', async function (req, res) {
     lISNB.then((book) => {
         res.send(book);
     });
-    
-     
-
 });
+
+
 
 // Get book details based on author
-public_users.get('/author/:author', function (req, res) {
-    //Write your code here
-    const author = req.params.author.toLowerCase();  // Convertimos el parámetro a minúsculas para una búsqueda insensible a mayúsculas/minúsculas
-    const bookKeys = Object.keys(books); // Obtener todas las claves del objeto 'books'
-    const filteredBooks = [];
+// public_users.get('/author/:author', function (req, res) {
+//     //Write your code here
+//     const author = req.params.author.toLowerCase();  // Convertimos el parámetro a minúsculas para una búsqueda insensible a mayúsculas/minúsculas
+//     const bookKeys = Object.keys(books); // Obtener todas las claves del objeto 'books'
+//     const filteredBooks = [];
 
-    // Iterar sobre cada clave y comprobar si el autor contiene las palabras solicitadas
-    bookKeys.forEach((key) => {
-        if (books[key].author.toLowerCase().includes(author)) {
-            filteredBooks.push(books[key]);
+//     // Iterar sobre cada clave y comprobar si el autor contiene las palabras solicitadas
+//     bookKeys.forEach((key) => {
+//         if (books[key].author.toLowerCase().includes(author)) {
+//             filteredBooks.push(books[key]);
+//         }
+//     });
+
+//     if (filteredBooks.length > 0) {
+//         return res.json(filteredBooks); // Devolver los libros que coinciden
+//     } else {
+//         return res.status(404).json({ message: "No se encontraron libros de ese autor" });
+//     }
+// });
+public_users.get('/author/:author', async function (req, res) {
+    //Write your code here
+    const author = req.params.author.toLowerCase();
+
+    let filterBooksByAuthor = new Promise((resolve, reject) => {
+        const bookKeys = Object.keys(books); // Obtener todas las claves
+        const filteredBooks = [];
+
+        // Iterar  
+        bookKeys.forEach((key) => {
+            if (books[key].author.toLowerCase().includes(author)) {
+                filteredBooks.push(books[key]);
+            }
+        });
+
+        if (filteredBooks.length > 0) {
+            resolve(filteredBooks); // Devolver los libros que coinciden
+        } else {
+            reject("No se encontraron libros de ese autor");
         }
+
     });
 
-    if (filteredBooks.length > 0) {
-        return res.json(filteredBooks); // Devolver los libros que coinciden
-    } else {
-        return res.status(404).json({ message: "No se encontraron libros de ese autor" });
-    }
+    filterBooksByAuthor.then((book) => {
+        res.send(book);
+    });
 });
+
+
+
 
 // Get all books based on title
 public_users.get('/title/:title', function (req, res) {
     //Write your code here
-    const lTitle = req.params.title.toLowerCase();  // Convertimos el parámetro a minúsculas para una búsqueda insensible a mayúsculas/minúsculas
-    const bookKeys = Object.keys(books); // Obtener todas las claves del objeto 'books'
+    const lTitle = req.params.title.toLowerCase();  
+
+    const bookKeys = Object.keys(books); 
     const filteredTitle = [];
 
-    // Iterar sobre cada clave y comprobar si el autor contiene las palabras solicitadas
-    bookKeys.forEach((key) => {
-        if (books[key].title.toLowerCase().includes(lTitle)) {
-            filteredTitle.push(books[key]);
+    let titleBook = new Promise((resolve, reject) => {
+ 
+        bookKeys.forEach((key) => {
+            if (books[key].title.toLowerCase().includes(lTitle)) {
+                filteredTitle.push(books[key]);
+            }
+        });
+
+        if (filteredTitle.length > 0) {
+            resolve(filteredTitle); // Devolver los libros que coinciden
+        } else {
+            reject("No se encontraron libros de ese autor");
         }
     });
 
-    if (filteredTitle.length > 0) {
-        return res.json(filteredTitle); // Devolver los libros que coinciden
-    } else {
-        return res.status(404).json({ message: "No se encontraron libros de ese autor" });
-    }
+    titleBook.then((ltitleBook) => {
+        res.send(ltitleBook);
+    });
+
 });
+
+
+
 
 //  Get book review
 public_users.get('/review/:isbn', function (req, res) {
